@@ -1934,8 +1934,7 @@
             </div>
             <div class="settings-section">
                 <span class="settings-label">Notificaciones</span>
-                <button class="settings-remove-bg" id="push-toggle-btn"
-                    style="background:var(--blue-light);color:var(--blue);" onclick="togglePushSubscription()">
+                <button class="settings-remove-bg" id="push-toggle-btn" style="background:var(--blue-light);color:var(--blue);" onclick="togglePushSubscription()">
                     🔔 Activar notificaciones
                 </button>
             </div>
@@ -1956,8 +1955,7 @@
                     <div class="letter-reply-text" id="lo-reply-text"></div>
                 </div>
                 <div id="lo-reply-form">
-                    <textarea class="letter-reply-input" id="lo-reply-input"
-                        placeholder="Escribe tu respuesta aquí... 💕"></textarea>
+                    <textarea class="letter-reply-input" id="lo-reply-input" placeholder="Escribe tu respuesta aquí... 💕"></textarea>
                     <button class="letter-reply-btn" onclick="saveLetterReply()">Guardar respuesta 💕</button>
                 </div>
             </div>
@@ -2001,8 +1999,7 @@
                 <div class="txt">Agregar fotos</div>
                 <div class="sub">Toca para seleccionar una o varias fotos</div>
             </div>
-            <input type="file" id="file-input" accept="image/*" multiple style="display:none"
-                onchange="addPhoto(event)" />
+            <input type="file" id="file-input" accept="image/*" multiple style="display:none" onchange="addPhoto(event)" />
 
             <!-- Selector de vista -->
             <div class="view-toggle">
@@ -2061,10 +2058,8 @@
         <div id="tab-cartas" class="tab-content tab-letters">
             <div class="letter-form-card">
                 <div class="letter-type-toggle">
-                    <button class="letter-type-btn active" id="ltype-normal" onclick="setLetterType('normal')">💌 Carta
-                        normal</button>
-                    <button class="letter-type-btn" id="ltype-programada" onclick="setLetterType('programada')">🔒 Carta
-                        programada</button>
+                    <button class="letter-type-btn active" id="ltype-normal" onclick="setLetterType('normal')">💌 Carta normal</button>
+                    <button class="letter-type-btn" id="ltype-programada" onclick="setLetterType('programada')">🔒 Carta programada</button>
                 </div>
                 <label class="form-label">Para quién es la carta</label>
                 <input class="letter-input" id="letter-title"
@@ -3116,7 +3111,7 @@
         // ══════════════════════════════════════════════════════════════
         if ("serviceWorker" in navigator) {
             window.addEventListener("load", () => {
-                navigator.serviceWorker.register("./sw.js").catch(err => {
+                navigator.serviceWorker.register("/sw.js").catch(err => {
                     console.error("Error registrando service worker:", err);
                 });
             });
@@ -3156,34 +3151,59 @@
         }
 
         async function togglePushSubscription() {
-            if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+            if (!("serviceWorker" in navigator)) {
+                showToast("🔕 Tu navegador no soporta service workers");
+                return;
+            }
+            if (!("PushManager" in window)) {
                 showToast("🔕 Tu navegador no soporta notificaciones push");
                 return;
             }
+
             const btn = document.getElementById("push-toggle-btn");
-            const reg = await navigator.serviceWorker.ready;
-            const existing = await reg.pushManager.getSubscription();
+            btn.textContent = "⏳ Activando...";
+            btn.disabled = true;
 
-            if (existing) {
-                // Desactivar
-                await db.from("push_subscriptions").delete().eq("endpoint", existing.endpoint);
-                await existing.unsubscribe();
-                showToast("🔕 Notificaciones desactivadas");
-                await updatePushButtonLabel();
-                return;
-            }
-
-            // Activar
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") {
-                showToast("🔕 Necesitas dar permiso para recibir notificaciones");
-                return;
-            }
-            if (VAPID_PUBLIC_KEY === "PEGA_AQUI_TU_VAPID_PUBLIC_KEY") {
-                showToast("⚠️ Falta configurar la VAPID key en el código");
-                return;
-            }
             try {
+                // Esperar el SW con timeout de 5 segundos
+                let reg;
+                try {
+                    reg = await Promise.race([
+                        navigator.serviceWorker.ready,
+                        new Promise((_, reject) => setTimeout(() => reject(new Error("SW timeout")), 5000))
+                    ]);
+                } catch (e) {
+                    // SW no instalado o tardó mucho — intentar registrarlo ahora
+                    showToast("⏳ Instalando service worker...");
+                    try {
+                        reg = await navigator.serviceWorker.register("/sw.js");
+                        await navigator.serviceWorker.ready;
+                    } catch (swErr) {
+                        showToast("❌ No se pudo instalar el service worker. ¿El archivo sw.js está en la raíz del repo?");
+                        btn.textContent = "🔔 Activar notificaciones";
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
+                const existing = await reg.pushManager.getSubscription();
+                if (existing) {
+                    await db.from("push_subscriptions").delete().eq("endpoint", existing.endpoint);
+                    await existing.unsubscribe();
+                    showToast("🔕 Notificaciones desactivadas");
+                    await updatePushButtonLabel();
+                    btn.disabled = false;
+                    return;
+                }
+
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") {
+                    showToast("🔕 Necesitas dar permiso para recibir notificaciones");
+                    btn.disabled = false;
+                    await updatePushButtonLabel();
+                    return;
+                }
+
                 const sub = await reg.pushManager.subscribe({
                     userVisibleOnly: true,
                     applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
@@ -3198,28 +3218,22 @@
                 if (error) throw error;
                 showToast("🔔 ¡Notificaciones activadas!");
             } catch (err) {
-                console.error("Error al suscribirse a push:", err);
-                showToast("❌ No se pudo activar las notificaciones");
+                console.error("Error push:", err);
+                showToast("❌ Error: " + err.message);
             }
+
+            btn.disabled = false;
             await updatePushButtonLabel();
         }
 
-        // Botón "Pensando en ti 💭" — dispara un push manual al otro
+        // Botón "Pensando en ti 💭" — inserta en Supabase, el trigger dispara el push
         async function sendThinkingOfYou() {
             try {
-                const res = await fetch("https://qxlfuexvnsopzajwycnz.supabase.co/functions/v1/send-push", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4bGZ1ZXh2bnNvcHphand5Y256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjU2ODUsImV4cCI6MjA5MjA0MTY4NX0.3UpiBM7dbylmsIQV-O0I8Fs-akXHzvyVVC5w8P7EhlA"
-                    },
-                    body: JSON.stringify({
-                        table: "manual",
-                        record: { author: currentAuthor, body: `${currentAuthor || "Tu pareja"} está pensando en ti ahora mismo 💕` },
-                        excludeAuthor: currentAuthor || null
-                    })
+                const { error } = await db.from("thinking_of_you").insert({
+                    author: currentAuthor || null,
+                    body: `${currentAuthor || "Tu pareja"} está pensando en ti ahora mismo 💕`
                 });
-                if (!res.ok) throw new Error("Status " + res.status);
+                if (error) throw error;
                 showToast("💭 Le avisamos que estás pensando en él/ella");
             } catch (err) {
                 console.error("Error enviando 'pensando en ti':", err);

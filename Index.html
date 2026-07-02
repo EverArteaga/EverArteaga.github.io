@@ -1,0 +1,3239 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nuestros Recuerdos 💖</title>
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="#D4537E" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <link rel="icon" href="./icon-192.png" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --pink: #D4537E;
+            --pink-light: #FBEAF0;
+            --pink-mid: #F4C0D1;
+            --blue: #378ADD;
+            --blue-light: #E6F1FB;
+            --text: #2C2015;
+            --text-muted: #7a6a5a;
+            --bg: #FFFBF8;
+            --card: #FFFFFF;
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            background: var(--bg);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+
+        /* ── LOCK ── */
+        #lock-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            padding: 2rem;
+            background: radial-gradient(ellipse at 20% 20%, #FBEAF055 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, #E6F1FB55 0%, transparent 60%),
+                radial-gradient(ellipse at 50% 50%, #EAF3DE33 0%, transparent 70%), #FFFBF8;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lock-deco {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.12;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .lock-deco:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            background: var(--pink);
+            top: -60px;
+            left: -60px;
+            animation-delay: 0s;
+        }
+
+        .lock-deco:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            background: var(--blue);
+            bottom: -40px;
+            right: -40px;
+            animation-delay: 2s;
+        }
+
+        .lock-deco:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            background: #BA7517;
+            top: 40%;
+            right: 5%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-16px)
+            }
+        }
+
+        .lock-emoji {
+            font-size: 64px;
+            animation: pulse 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.1)
+            }
+        }
+
+        .lock-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            color: var(--pink);
+            text-align: center;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lock-title em {
+            font-style: italic;
+            color: var(--blue);
+        }
+
+        .lock-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lock-box {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 40px rgba(212, 83, 126, 0.12);
+            padding: 28px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            width: 100%;
+            max-width: 340px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .lock-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .lock-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--pink-mid);
+            border-radius: var(--radius-sm);
+            font-size: 20px;
+            font-family: 'DM Sans', sans-serif;
+            text-align: center;
+            letter-spacing: 6px;
+            color: var(--pink);
+            background: var(--pink-light);
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .lock-input:focus {
+            border-color: var(--pink);
+        }
+
+        .lock-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--pink), #C0395F);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 4px 16px rgba(212, 83, 126, 0.35);
+        }
+
+        .lock-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(212, 83, 126, 0.4);
+        }
+
+        .lock-btn:active {
+            transform: scale(0.98);
+        }
+
+        .lock-error {
+            font-size: 13px;
+            color: #E24B4A;
+            text-align: center;
+            min-height: 18px;
+        }
+
+        /* ── APP ── */
+        #app {
+            display: none;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #D4537E, #378ADD 50%, #639922);
+            padding: 20px 24px 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 24px rgba(212, 83, 126, 0.3);
+        }
+
+        .header-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+
+        .header-title em {
+            font-style: italic;
+        }
+
+        .header-sub {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            border-radius: 20px;
+            padding: 7px 16px;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 2px solid #F4C0D1;
+            position: sticky;
+            top: 74px;
+            z-index: 99;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .tab.active {
+            color: var(--pink);
+            border-bottom-color: var(--pink);
+            background: #FFF5F8;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: #FDF8F5;
+            min-height: calc(100vh - 140px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ── FOTOS — vista mejorada ── */
+        .upload-area {
+            border: 2.5px dashed var(--pink-mid);
+            border-radius: var(--radius);
+            padding: 32px 20px;
+            text-align: center;
+            background: var(--pink-light);
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            background: #F4C0D1;
+            border-color: var(--pink);
+            transform: scale(1.01);
+        }
+
+        .upload-area .icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .upload-area .txt {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--pink);
+        }
+
+        .upload-area .sub {
+            font-size: 12px;
+            color: #D4537E;
+            margin-top: 4px;
+        }
+
+        /* Selector de vista */
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            justify-content: flex-end;
+        }
+
+        .view-btn {
+            background: white;
+            border: 1.5px solid var(--pink-mid);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.15s;
+            line-height: 1;
+        }
+
+        .view-btn.active {
+            background: var(--pink);
+            border-color: var(--pink);
+            color: white;
+        }
+
+        /* Grid normal */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+        }
+
+        /* Grid grande (2 columnas) */
+        .photo-grid.view-large {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+
+        /* Lista */
+        .photo-grid.view-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .photo-card {
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 1;
+            background: var(--pink-mid);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+        }
+
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Vista lista — card horizontal */
+        .view-list .photo-card {
+            aspect-ratio: unset;
+            display: flex;
+            align-items: stretch;
+            height: 110px;
+        }
+
+        .view-list .photo-card img {
+            width: 110px;
+            height: 110px;
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+
+        .view-list .photo-card-info {
+            flex: 1;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: white;
+        }
+
+        .view-list .photo-date-text {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .view-list .photo-reactions-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* Vista grande — aspect ratio más alto */
+        .view-large .photo-card {
+            aspect-ratio: 4/5;
+        }
+
+        .photo-del {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0, 0, 0, 0.55);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 13px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+
+        .photo-card:hover .photo-del {
+            display: flex;
+        }
+
+        .photo-del:hover {
+            background: #E24B4A;
+        }
+
+        .photo-date {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.6));
+            color: white;
+            font-size: 11px;
+            padding: 24px 8px 6px;
+            text-align: center;
+        }
+
+        .view-list .photo-date {
+            display: none;
+        }
+
+        /* Reacciones en fotos (overlay) */
+        .photo-reactions {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .view-list .photo-reactions {
+            display: none;
+        }
+
+        .reaction-pill {
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            border-radius: 20px;
+            padding: 3px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            transition: transform 0.15s, background 0.15s;
+            backdrop-filter: blur(4px);
+        }
+
+        .reaction-pill:hover {
+            transform: scale(1.15);
+        }
+
+        .reaction-pill.mine {
+            background: rgba(212, 83, 126, 0.75);
+        }
+
+        .reaction-pill .r-count {
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Botón de añadir reacción foto */
+        .photo-add-reaction {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: rgba(0, 0, 0, 0.45);
+            border: none;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: background 0.15s;
+            backdrop-filter: blur(4px);
+        }
+
+        .photo-card:hover .photo-add-reaction {
+            display: flex;
+        }
+
+        .view-list .photo-card:hover .photo-add-reaction {
+            display: none;
+        }
+
+        /* ── LIGHTBOX mejorado ── */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lightbox.open {
+            display: flex;
+        }
+
+        #lightbox-img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: var(--radius-sm);
+            object-fit: contain;
+            transition: opacity 0.2s;
+        }
+
+        #lightbox-close {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #lightbox-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        #lightbox-reactions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .lb-reaction {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 15px;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+
+        .lb-reaction:hover {
+            background: rgba(255, 255, 255, 0.22);
+            transform: scale(1.08);
+        }
+
+        .lb-reaction.mine {
+            background: rgba(212, 83, 126, 0.6);
+            border-color: var(--pink);
+        }
+
+        .lb-reaction .r-count {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        #lightbox-nav {
+            display: flex;
+            gap: 16px;
+            margin-top: 10px;
+        }
+
+        .lb-nav-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+        }
+
+        .lb-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .lb-nav-btn:disabled {
+            opacity: 0.25;
+            cursor: default;
+        }
+
+        /* ── NOTAS ── */
+        .note-form-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .note-input,
+        .note-textarea {
+            width: 100%;
+            border: 1.5px solid #F4C0D1;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            background: white;
+            transition: border-color 0.2s;
+            outline: none;
+            margin-bottom: 14px;
+        }
+
+        .note-input:focus,
+        .note-textarea:focus {
+            border-color: var(--pink);
+        }
+
+        .note-textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        .mood-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .mood-chip {
+            border: 1.5px solid #F4C0D1;
+            background: white;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            color: #993556;
+            transition: all 0.15s;
+        }
+
+        .mood-chip.on {
+            background: var(--pink);
+            color: white;
+            border-color: var(--pink);
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, var(--blue), #185FA5);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(55, 138, 221, 0.35);
+            transition: transform 0.15s;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+        }
+
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .note-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--blue);
+            position: relative;
+            transition: transform 0.15s;
+        }
+
+        .note-card:hover {
+            transform: translateX(3px);
+        }
+
+        .note-card-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #185FA5;
+            margin-bottom: 4px;
+            padding-right: 30px;
+        }
+
+        .note-card-mood {
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .note-card-body {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        .note-card-date {
+            font-size: 11px;
+            color: #85B7EB;
+            margin-top: 8px;
+        }
+
+        .note-del-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #B5D4F4;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+
+        .note-del-btn:hover {
+            color: #E24B4A;
+        }
+
+        .note-edit-btn {
+            position: absolute;
+            top: 12px;
+            right: 38px;
+            background: none;
+            border: none;
+            font-size: 15px;
+            cursor: pointer;
+            line-height: 1;
+            opacity: 0.45;
+            transition: opacity 0.15s;
+        }
+
+        .note-edit-btn:hover {
+            opacity: 1;
+        }
+
+        /* Reacciones en notas */
+        .note-reactions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #F4EAF0;
+        }
+
+        .note-reaction-btn {
+            background: #FFF0F5;
+            border: 1.5px solid #F4C0D1;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--pink);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .note-reaction-btn:hover {
+            background: var(--pink-mid);
+            transform: scale(1.08);
+        }
+
+        .note-reaction-btn.mine {
+            background: var(--pink);
+            color: white;
+            border-color: var(--pink);
+        }
+
+        .note-reaction-btn .r-count {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .note-add-reaction {
+            background: none;
+            border: 1.5px dashed #F4C0D1;
+            border-radius: 20px;
+            padding: 5px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .note-add-reaction:hover {
+            border-color: var(--pink);
+            color: var(--pink);
+        }
+
+        /* ── PICKER DE EMOJIS ── */
+        .emoji-picker-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+        }
+
+        .emoji-picker-overlay.open {
+            display: block;
+        }
+
+        .emoji-picker {
+            position: fixed;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+            padding: 16px;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+        }
+
+        .emoji-picker-title {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .emoji-picker-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .emoji-opt {
+            background: none;
+            border: 1.5px solid transparent;
+            border-radius: 10px;
+            padding: 6px 10px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .emoji-opt:hover {
+            background: var(--pink-light);
+            border-color: var(--pink-mid);
+            transform: scale(1.15);
+        }
+
+        /* ── MODAL CONFIRMAR ELIMINAR ── */
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .confirm-overlay.open {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            max-width: 320px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        .confirm-icon {
+            font-size: 44px;
+            margin-bottom: 12px;
+        }
+
+        .confirm-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .confirm-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .confirm-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .confirm-cancel {
+            flex: 1;
+            padding: 12px;
+            border: 1.5px solid #E0D5CC;
+            border-radius: var(--radius-sm);
+            background: white;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+
+        .confirm-cancel:hover {
+            background: #F5F0EC;
+        }
+
+        .confirm-delete {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, #E24B4A, #C03030);
+            color: white;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.15s;
+        }
+
+        .confirm-delete:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(226, 75, 74, 0.4);
+        }
+
+        /* ── MISC ── */
+        .counter-banner {
+            background: linear-gradient(135deg, #FBEAF0, #E6F1FB);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #F4C0D1;
+            align-items: center;
+        }
+
+        .counter-banner .num {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            color: var(--pink);
+            line-height: 1;
+        }
+
+        .counter-banner .lbl {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .counter-banner .lbl strong {
+            color: var(--text);
+            display: block;
+            font-size: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .empty-state .big {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2C2015;
+            color: white;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 13px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* ── FONDO PERSONALIZADO ── */
+        #app.has-bg {
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+
+        #app.has-bg .tab-content {
+            background: rgba(253, 248, 245, 0.45);
+            backdrop-filter: blur(2px);
+        }
+
+        #app.has-bg .app-header {
+            background: linear-gradient(135deg, rgba(212, 83, 126, 0.70), rgba(55, 138, 221, 0.70) 50%, rgba(99, 153, 34, 0.70));
+            backdrop-filter: blur(8px);
+        }
+
+        #app.has-bg .tabs {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(8px);
+        }
+
+        #lock-screen.has-bg {
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+
+        #lock-screen.has-bg .lock-box {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(8px);
+        }
+
+        /* ── BOTÓN SETTINGS ── */
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            margin-right: 8px;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* ── MODAL SETTINGS ── */
+        .settings-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .settings-overlay.open {
+            display: flex;
+        }
+
+        .settings-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 28px 24px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        .settings-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--pink);
+            margin-bottom: 20px;
+        }
+
+        .settings-section {
+            margin-bottom: 20px;
+        }
+
+        .settings-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .settings-bg-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--pink-mid);
+            background: var(--pink-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--pink);
+            font-weight: 500;
+            transition: all 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .settings-bg-preview:hover {
+            border-color: var(--pink);
+            background: #F4C0D1;
+        }
+
+        .settings-bg-preview img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .settings-bg-preview .overlay-label {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.75);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .settings-remove-bg {
+            margin-top: 8px;
+            width: 100%;
+            padding: 9px;
+            border: 1.5px solid #E0D5CC;
+            border-radius: var(--radius-sm);
+            background: white;
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            color: #E24B4A;
+            transition: all 0.15s;
+        }
+
+        .settings-remove-bg:hover {
+            background: #FFF0F0;
+        }
+
+        .settings-close {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--pink), #C0395F);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+
+        /* ── CARTAS DE AMOR ── */
+        .tab-letters {}
+
+        .letter-form-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+            border-top: 4px solid var(--pink);
+        }
+
+        .letter-input,
+        .letter-textarea {
+            width: 100%;
+            border: 1.5px solid #F4C0D1;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            background: white;
+            transition: border-color 0.2s;
+            outline: none;
+            margin-bottom: 14px;
+        }
+
+        .letter-input:focus,
+        .letter-textarea:focus {
+            border-color: var(--pink);
+        }
+
+        .letter-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .letter-date-input {
+            width: 100%;
+            border: 1.5px solid #F4C0D1;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+            background: white;
+            outline: none;
+            margin-bottom: 14px;
+            cursor: pointer;
+        }
+
+        .letter-date-input:focus {
+            border-color: var(--pink);
+        }
+
+        /* Cards de cartas */
+        .letter-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--pink);
+            position: relative;
+            transition: transform 0.15s;
+        }
+
+        .letter-card:hover {
+            transform: translateX(3px);
+        }
+
+        .letter-card.locked {
+            border-left-color: #B5D4F4;
+            opacity: 0.85;
+        }
+
+        .letter-card-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #C0395F;
+            margin-bottom: 4px;
+            padding-right: 30px;
+        }
+
+        .letter-card.locked .letter-card-title {
+            color: var(--text-muted);
+        }
+
+        .letter-card-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .letter-card-body {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        .letter-lock-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--blue-light);
+            color: var(--blue);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-top: 6px;
+        }
+
+        .letter-countdown {
+            font-size: 12px;
+            color: var(--blue);
+            font-weight: 600;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .letter-preview-blur {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            filter: blur(3.5px);
+            user-select: none;
+            pointer-events: none;
+            line-height: 1.5;
+            max-height: 36px;
+            overflow: hidden;
+        }
+
+        .letter-type-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .letter-type-btn {
+            flex: 1;
+            padding: 9px;
+            border-radius: 10px;
+            border: 2px solid #F4EAF0;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: var(--text-muted);
+        }
+
+        .letter-type-btn.active {
+            border-color: var(--pink);
+            color: var(--pink);
+            background: #FFF0F5;
+            font-weight: 600;
+        }
+
+        .letter-reply-section {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px dashed #F4C0D1;
+        }
+
+        .letter-reply-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .letter-reply-text {
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.65;
+            white-space: pre-wrap;
+            background: #FFF8FB;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        .letter-reply-input {
+            width: 100%;
+            min-height: 80px;
+            border: 1.5px solid #F4C0D1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+            color: var(--text);
+        }
+
+        .letter-reply-btn {
+            margin-top: 8px;
+            padding: 8px 18px;
+            background: linear-gradient(135deg, var(--pink), #C0395F);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .letter-del-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #F4C0D1;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .letter-del-btn:hover {
+            color: #E24B4A;
+        }
+
+        /* Modal carta desbloqueada */
+        .letter-open-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(2px);
+        }
+
+        .letter-open-overlay.open {
+            display: flex;
+        }
+
+        .letter-open-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 16px 60px rgba(212, 83, 126, 0.3);
+            animation: letterPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes letterPop {
+            from {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .letter-open-icon {
+            font-size: 52px;
+            margin-bottom: 12px;
+        }
+
+        .letter-open-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--pink);
+            margin-bottom: 6px;
+        }
+
+        .letter-open-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .letter-open-body {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.7;
+            text-align: left;
+            background: var(--pink-light);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 20px;
+            white-space: pre-wrap;
+        }
+
+        .letter-open-close {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--pink), #C0395F);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+        }
+
+        /* ── SELECTOR DE AUTOR ── */
+        #author-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(2px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .author-box {
+            background: white;
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            text-align: center;
+            box-shadow: 0 12px 48px rgba(212, 83, 126, 0.2);
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .author-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: var(--pink);
+            margin-bottom: 6px;
+        }
+
+        .author-box p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .author-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .author-btn {
+            flex: 1;
+            padding: 14px 10px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .author-btn.ever {
+            background: linear-gradient(135deg, #378ADD, #185FA5);
+            color: white;
+            box-shadow: 0 4px 14px rgba(55, 138, 221, 0.35);
+        }
+
+        .author-btn.rossi {
+            background: linear-gradient(135deg, var(--pink), #C0395F);
+            color: white;
+            box-shadow: 0 4px 14px rgba(212, 83, 126, 0.35);
+        }
+
+        .author-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Badge de autor en note-card */
+        .note-author-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .note-author-badge.ever {
+            background: #E6F1FB;
+            color: #185FA5;
+            border-left: 3px solid #378ADD;
+        }
+
+        .note-author-badge.rossi {
+            background: var(--pink-light);
+            color: #993556;
+            border-left: 3px solid var(--pink);
+        }
+
+        .note-card.author-ever {
+            border-left-color: var(--blue);
+        }
+
+        .note-card.author-rossi {
+            border-left-color: var(--pink);
+        }
+
+        /* ── NOTA DE VOZ ── */
+        .voice-recorder {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding: 12px 14px;
+            border: 1.5px solid #F4C0D1;
+            border-radius: var(--radius-sm);
+            background: var(--pink-light);
+        }
+
+        .voice-rec-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: var(--pink);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .voice-rec-btn.recording {
+            background: #E24B4A;
+            animation: recPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes recPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(226, 75, 74, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(226, 75, 74, 0);
+            }
+        }
+
+        .voice-rec-info {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .voice-rec-timer {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--pink);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .voice-rec-clear {
+            background: none;
+            border: none;
+            color: #E24B4A;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Mini reproductor en note card */
+        .note-audio-player {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: var(--blue-light);
+            border-radius: var(--radius-sm);
+        }
+
+        .audio-play-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--blue);
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .audio-play-btn:hover {
+            background: #185FA5;
+        }
+
+        .audio-progress-wrap {
+            flex: 1;
+            height: 4px;
+            background: #B5D4F4;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .audio-progress-bar {
+            height: 100%;
+            background: var(--blue);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .audio-duration {
+            font-size: 11px;
+            color: var(--blue);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOCK -->
+    <div id="lock-screen">
+        <div class="lock-deco"></div>
+        <div class="lock-deco"></div>
+        <div class="lock-deco"></div>
+        <div class="lock-emoji">🪷🌷</div>
+        <div class="lock-title">Nuestros<br /><em>Recuerdos</em></div>
+        <div class="lock-sub">Un espacio solo para los dos 🌈</div>
+        <div class="lock-box">
+            <div class="lock-label">Contraseña secreta</div>
+            <input class="lock-input" type="password" id="pass-input" placeholder="••••••••" maxlength="12" />
+            <button class="lock-btn" onclick="checkPass()">Entrar ✨</button>
+            <div class="lock-error" id="lock-error"></div>
+        </div>
+    </div>
+
+    <!-- SELECTOR DE AUTOR -->
+    <div id="author-screen" style="display:none;">
+        <div class="author-box">
+            <h2>¿Quién eres? 💕</h2>
+            <p>Así sabremos quién escribió cada recuerdo</p>
+            <div class="author-btns">
+                <button class="author-btn ever" onclick="selectAuthor('Ever')">💙 Ever</button>
+                <button class="author-btn rossi" onclick="selectAuthor('Rossi')">🩷 Rossi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LIGHTBOX mejorado -->
+    <div id="lightbox">
+        <button id="lightbox-close" onclick="closeLightbox()">✕</button>
+        <img id="lightbox-img" src="" alt="" />
+        <div id="lightbox-date"></div>
+        <div id="lightbox-reactions"></div>
+        <div id="lightbox-nav">
+            <button class="lb-nav-btn" id="lb-prev" onclick="lightboxNav(-1)">‹</button>
+            <button class="lb-nav-btn" id="lb-next" onclick="lightboxNav(1)">›</button>
+        </div>
+    </div>
+
+    <!-- EMOJI PICKER -->
+    <div class="emoji-picker-overlay" id="emoji-overlay" onclick="closeEmojiPicker()">
+    </div>
+    <div class="emoji-picker" id="emoji-picker" style="display:none;">
+        <div class="emoji-picker-title">Elige una reacción</div>
+        <div class="emoji-picker-grid">
+            <button class="emoji-opt" onclick="selectEmoji('❤️')">❤️</button>
+            <button class="emoji-opt" onclick="selectEmoji('😍')">😍</button>
+            <button class="emoji-opt" onclick="selectEmoji('🥰')">🥰</button>
+            <button class="emoji-opt" onclick="selectEmoji('😂')">😂</button>
+            <button class="emoji-opt" onclick="selectEmoji('😮')">😮</button>
+            <button class="emoji-opt" onclick="selectEmoji('🔥')">🔥</button>
+            <button class="emoji-opt" onclick="selectEmoji('✨')">✨</button>
+            <button class="emoji-opt" onclick="selectEmoji('💫')">💫</button>
+            <button class="emoji-opt" onclick="selectEmoji('🌊')">🌊</button>
+            <button class="emoji-opt" onclick="selectEmoji('💙')">💙</button>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIRMAR ELIMINAR -->
+    <div class="confirm-overlay" id="confirm-overlay">
+        <div class="confirm-box">
+            <div class="confirm-icon">🗑️</div>
+            <div class="confirm-title" id="confirm-title">¿Eliminar recuerdo?</div>
+            <div class="confirm-sub" id="confirm-sub">Esta acción no se puede deshacer.</div>
+            <div class="confirm-btns">
+                <button class="confirm-cancel" onclick="closeConfirm()">Cancelar</button>
+                <button class="confirm-delete" id="confirm-ok">Sí, eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- SETTINGS MODAL -->
+    <div class="settings-overlay" id="settings-overlay">
+        <div class="settings-box">
+            <div class="settings-title">⚙️ Ajustes</div>
+            <div class="settings-section">
+                <span class="settings-label">Fondo personalizado</span>
+                <div class="settings-bg-preview" id="bg-preview"
+                    onclick="document.getElementById('bg-file-input').click()">
+                    <span class="overlay-label">🖼️ Toca para elegir una foto</span>
+                </div>
+                <input type="file" id="bg-file-input" accept="image/*" style="display:none"
+                    onchange="applyBackground(event)" />
+                <button class="settings-remove-bg" onclick="removeBackground()">🗑️ Quitar fondo</button>
+            </div>
+            <div class="settings-section">
+                <span class="settings-label">Notificaciones</span>
+                <button class="settings-remove-bg" id="push-toggle-btn"
+                    style="background:var(--blue-light);color:var(--blue);" onclick="togglePushSubscription()">
+                    🔔 Activar notificaciones
+                </button>
+            </div>
+            <button class="settings-close" onclick="closeSettings()">Listo ✓</button>
+        </div>
+    </div>
+
+    <!-- MODAL CARTA DESBLOQUEADA -->
+    <div class="letter-open-overlay" id="letter-open-overlay">
+        <div class="letter-open-box">
+            <div class="letter-open-icon">💌</div>
+            <div class="letter-open-title" id="lo-title">Una carta para ti</div>
+            <div class="letter-open-date" id="lo-date"></div>
+            <div class="letter-open-body" id="lo-body"></div>
+            <div class="letter-reply-section" id="lo-reply-section">
+                <div class="letter-reply-label">💬 Respuesta</div>
+                <div id="lo-reply-display" style="display:none;">
+                    <div class="letter-reply-text" id="lo-reply-text"></div>
+                </div>
+                <div id="lo-reply-form">
+                    <textarea class="letter-reply-input" id="lo-reply-input"
+                        placeholder="Escribe tu respuesta aquí... 💕"></textarea>
+                    <button class="letter-reply-btn" onclick="saveLetterReply()">Guardar respuesta 💕</button>
+                </div>
+            </div>
+            <button class="letter-open-close" onclick="closeLetterModal()">Guardar en el corazón 💖</button>
+        </div>
+    </div>
+
+    <!-- CANVAS CONFETTI -->
+    <canvas id="confetti-canvas" style="position:fixed;inset:0;pointer-events:none;z-index:9998;display:none;"></canvas>
+
+    <!-- APP -->
+    <div id="app">
+        <div class="app-header">
+            <div>
+                <div class="header-title">💖 Nuestros <em>Recuerdos</em></div>
+                <div class="header-sub" id="header-author-sub">Desde el 18 de abril de 2024 • En la nube ☁️</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <button class="settings-btn" onclick="sendThinkingOfYou()" title="Pensando en ti">💭</button>
+                <button class="logout-btn" onclick="switchUser()" title="Cambiar quién soy"
+                    style="font-size:12px;padding:6px 12px;">👤 Cambiar</button>
+                <button class="settings-btn" onclick="openSettings()" title="Ajustes">⚙️</button>
+                <button class="logout-btn" onclick="logout()">Salir</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('fotos',this)">📸 Fotos</div>
+            <div class="tab" onclick="switchTab('notas',this)">📝 Notas</div>
+            <div class="tab" onclick="switchTab('cartas',this)">💌 Cartas</div>
+        </div>
+
+        <!-- TAB FOTOS -->
+        <div id="tab-fotos" class="tab-content active">
+            <div class="counter-banner">
+                <div class="num" id="photo-count">0</div>
+                <div class="lbl"><strong>Momentos guardados</strong>Cada foto, un recuerdo eterno</div>
+            </div>
+            <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                <div class="icon">🌈</div>
+                <div class="txt">Agregar fotos</div>
+                <div class="sub">Toca para seleccionar una o varias fotos</div>
+            </div>
+            <input type="file" id="file-input" accept="image/*" multiple style="display:none"
+                onchange="addPhoto(event)" />
+
+            <!-- Selector de vista -->
+            <div class="view-toggle">
+                <button class="view-btn active" id="vbtn-grid" onclick="setView('grid')" title="Cuadrícula">⊞</button>
+                <button class="view-btn" id="vbtn-large" onclick="setView('large')" title="Grande">▣</button>
+                <button class="view-btn" id="vbtn-list" onclick="setView('list')" title="Lista">☰</button>
+            </div>
+
+            <div id="photo-grid" class="photo-grid"></div>
+            <div id="photos-empty" class="empty-state">
+                <div class="big">📷</div>
+                Aún no hay fotos. ¡Agrega la primera!
+            </div>
+        </div>
+
+        <!-- TAB NOTAS -->
+        <div id="tab-notas" class="tab-content">
+            <div class="note-form-card">
+                <label class="form-label">Título del momento</label>
+                <input class="note-input" id="note-title" placeholder="Ej: Primera vez en la playa..." />
+                <label class="form-label">¿Cómo se sintió?</label>
+                <div class="mood-row">
+                    <button class="mood-chip" onclick="pickMood(this,'💛 Feliz')">💛 Feliz</button>
+                    <button class="mood-chip" onclick="pickMood(this,'🩷 Amor')">🩷 Amor</button>
+                    <button class="mood-chip" onclick="pickMood(this,'🌊 Emocionante')">🌊 Emocionante</button>
+                    <button class="mood-chip" onclick="pickMood(this,'🌿 Tranquilo')">🌿 Tranquilo</button>
+                    <button class="mood-chip" onclick="pickMood(this,'🎉 Especial')">🎉 Especial</button>
+                </div>
+                <label class="form-label">Cuéntalo</label>
+                <textarea class="note-textarea" id="note-body"
+                    placeholder="Escribe lo que vivieron juntos..."></textarea>
+
+                <!-- NOTA DE VOZ -->
+                <label class="form-label">Nota de voz (opcional)</label>
+                <div class="voice-recorder" id="voice-recorder">
+                    <button class="voice-rec-btn" id="voice-rec-btn" onclick="toggleRecording()"
+                        title="Grabar">🎙️</button>
+                    <div class="voice-rec-info">
+                        <div id="voice-rec-label">Toca para grabar un mensaje de voz</div>
+                        <div class="voice-rec-timer" id="voice-rec-timer" style="display:none;">0:00</div>
+                    </div>
+                    <button class="voice-rec-clear" id="voice-rec-clear" style="display:none;"
+                        onclick="clearRecording()" title="Borrar">✕</button>
+                </div>
+
+                <button class="save-btn" id="save-note-btn" onclick="saveNote()">Guardar recuerdo 💾</button>
+            </div>
+            <div id="notes-list"></div>
+            <div id="notes-empty" class="empty-state">
+                <div class="big">✍️</div>
+                Escribe su primer recuerdo juntos
+            </div>
+        </div>
+
+        <!-- TAB CARTAS -->
+        <div id="tab-cartas" class="tab-content tab-letters">
+            <div class="letter-form-card">
+                <div class="letter-type-toggle">
+                    <button class="letter-type-btn active" id="ltype-normal" onclick="setLetterType('normal')">💌 Carta
+                        normal</button>
+                    <button class="letter-type-btn" id="ltype-programada" onclick="setLetterType('programada')">🔒 Carta
+                        programada</button>
+                </div>
+                <label class="form-label">Para quién es la carta</label>
+                <input class="letter-input" id="letter-title"
+                    placeholder="Ej: Para ti, el día de nuestro aniversario..." />
+                <label class="form-label">Escribe tu carta de amor</label>
+                <textarea class="letter-textarea" id="letter-body"
+                    placeholder="Escribe todo lo que sientes... 💌"></textarea>
+                <div id="letter-date-section" style="display:none;">
+                    <label class="form-label">¿Cuándo se podrá abrir? 📅</label>
+                    <input class="letter-date-input" type="date" id="letter-date" />
+                </div>
+                <button class="save-btn" id="save-letter-btn" onclick="saveLetter()"
+                    style="background:linear-gradient(135deg,var(--pink),#C0395F);box-shadow:0 4px 14px rgba(212,83,126,0.35);">
+                    Guardar carta 💌
+                </button>
+            </div>
+            <div id="letters-list"></div>
+            <div id="letters-empty" class="empty-state">
+                <div class="big">💌</div>
+                Escribe tu primera carta de amor
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://qxlfuexvnsopzajwycnz.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4bGZ1ZXh2bnNvcHphand5Y256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjU2ODUsImV4cCI6MjA5MjA0MTY4NX0.3UpiBM7dbylmsIQV-O0I8Fs-akXHzvyVVC5w8P7EhlA";
+        // Contraseña almacenada como hash SHA-256 (no en texto plano)
+        const PASSWORD_HASH = "f49e6060d36af5f6f957457af9fc8d9af7cafd71511508d05942e622ba4961d2"; // sha256("18042024")
+        async function hashPassword(pwd) {
+            const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pwd));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let mood = "";
+        let currentView = "grid";
+        let allPhotos = [];
+        let lbIndex = 0;
+
+        // ── AUTOR ─────────────────────────────────────────────────────
+        let currentAuthor = localStorage.getItem("diary_author") || "";
+
+        function selectAuthor(name) {
+            currentAuthor = name;
+            localStorage.setItem("diary_author", name);
+            document.getElementById("author-screen").style.display = "none";
+            // Actualizar subtítulo del header
+            updateHeaderAuthor();
+        }
+
+        function updateHeaderAuthor() {
+            const sub = document.getElementById("header-author-sub");
+            if (!sub) return;
+            const ANNIVERSARY = new Date("2024-04-18");
+            const today = new Date();
+            const days = Math.floor((today - ANNIVERSARY) / (1000 * 60 * 60 * 24));
+            const greeting = currentAuthor === "Ever" ? "💙 Hola Ever" : currentAuthor === "Rossi" ? "🩷 Hola Rossi" : "💖";
+            sub.textContent = currentAuthor
+                ? `${greeting} • ${days} días juntos 🗓️`
+                : `${days} días juntos 🗓️ • En la nube ☁️`;
+        }
+
+        // ── REACCIONES: emoji usable ──────────────────────────────────
+        // Guardamos reacciones en localStorage con clave "r_photo_{id}" o "r_note_{id}"
+        // y en Supabase en la columna reactions JSONB (si no existe, no rompe nada).
+        // Formato en Supabase: { "❤️": 2, "😍": 1 }
+        // Formato local: Set de emojis que YO puse
+
+        function getMyReactions(type, id) {
+            try { return new Set(JSON.parse(localStorage.getItem(`r_${type}_${id}`) || "[]")); }
+            catch { return new Set(); }
+        }
+        function setMyReaction(type, id, emoji, active) {
+            const s = getMyReactions(type, id);
+            active ? s.add(emoji) : s.delete(emoji);
+            localStorage.setItem(`r_${type}_${id}`, JSON.stringify([...s]));
+        }
+
+        // ── EMOJI PICKER ──────────────────────────────────────────────
+        let pickerCallback = null;
+        const _pickerTarget = { type: null, id: null, idx: null };
+
+        function openEmojiPickerForNote(anchorEl, noteId) {
+            _pickerTarget.type = "note";
+            _pickerTarget.id = noteId;
+            pickerCallback = null;
+            _openEmojiPickerAt(anchorEl);
+        }
+        function openEmojiPickerForPhoto(anchorEl, photoId, idx) {
+            _pickerTarget.type = "photo";
+            _pickerTarget.id = photoId;
+            _pickerTarget.idx = idx;
+            pickerCallback = null;
+            _openEmojiPickerAt(anchorEl);
+        }
+        function _openEmojiPickerAt(anchorEl) {
+            const picker = document.getElementById("emoji-picker");
+            const overlay = document.getElementById("emoji-overlay");
+            const rect = anchorEl.getBoundingClientRect();
+            picker.style.display = "flex";
+            overlay.classList.add("open");
+            let top = rect.bottom + 8;
+            let left = rect.left;
+            if (top + 180 > window.innerHeight) top = rect.top - 180;
+            if (left + 220 > window.innerWidth) left = window.innerWidth - 228;
+            picker.style.top = top + "px";
+            picker.style.left = left + "px";
+        }
+        function openEmojiPicker(anchorEl, callback) {
+            pickerCallback = callback;
+            _pickerTarget.type = null;
+            _pickerTarget.id = null;
+            _pickerTarget.idx = null;
+            _openEmojiPickerAt(anchorEl);
+        }
+        function closeEmojiPicker() {
+            document.getElementById("emoji-picker").style.display = "none";
+            document.getElementById("emoji-overlay").classList.remove("open");
+            pickerCallback = null;
+        }
+        function selectEmoji(emoji) {
+            closeEmojiPicker();
+            if (_pickerTarget.type === "note") {
+                toggleNoteReaction(_pickerTarget.id, emoji);
+                _pickerTarget.type = null;
+            } else if (_pickerTarget.type === "photo") {
+                togglePhotoReaction(_pickerTarget.id, emoji, _pickerTarget.idx);
+                _pickerTarget.type = null;
+            } else if (pickerCallback) {
+                pickerCallback(emoji);
+            }
+        }
+
+        // ── CONFIRM MODAL ─────────────────────────────────────────────
+        let confirmResolve = null;
+
+        function showConfirm(title, sub) {
+            document.getElementById("confirm-title").textContent = title;
+            document.getElementById("confirm-sub").textContent = sub;
+            document.getElementById("confirm-overlay").classList.add("open");
+            return new Promise(resolve => {
+                confirmResolve = resolve;
+                document.getElementById("confirm-ok").onclick = () => {
+                    closeConfirm(true);
+                };
+            });
+        }
+        function closeConfirm(result = false) {
+            document.getElementById("confirm-overlay").classList.remove("open");
+            if (confirmResolve) {
+                const fn = confirmResolve;
+                confirmResolve = null;
+                fn(result);
+            }
+        }
+
+        // ── TOAST ─────────────────────────────────────────────────────
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.textContent = msg;
+            t.classList.add("show");
+            setTimeout(() => t.classList.remove("show"), 2500);
+        }
+
+        // ── AUTH ──────────────────────────────────────────────────────
+        async function checkPass() {
+            const v = document.getElementById("pass-input").value;
+            const hash = await hashPassword(v);
+            if (hash === PASSWORD_HASH) {
+                document.getElementById("lock-screen").style.display = "none";
+                const app = document.getElementById("app");
+                app.style.display = "flex";
+                app.style.flexDirection = "column";
+                // Mostrar selector de autor si no está guardado
+                if (!currentAuthor) {
+                    document.getElementById("author-screen").style.display = "flex";
+                } else {
+                    updateHeaderAuthor();
+                }
+                loadAll();
+            } else {
+                const e = document.getElementById("lock-error");
+                e.textContent = "Contraseña incorrecta. Pista: fecha de aniversario 💝";
+                document.getElementById("pass-input").value = "";
+                setTimeout(() => e.textContent = "", 3500);
+            }
+        }
+        document.getElementById("pass-input").addEventListener("keydown", e => { if (e.key === "Enter") checkPass(); });
+
+        function switchUser() {
+            document.getElementById("author-screen").style.display = "flex";
+        }
+
+        function logout() {
+            document.getElementById("app").style.display = "none";
+            document.getElementById("lock-screen").style.display = "flex";
+            document.getElementById("pass-input").value = "";
+            // Limpiar autor para que vuelva a elegir al entrar
+            currentAuthor = "";
+            localStorage.removeItem("diary_author");
+        }
+
+        function switchTab(name, el) {
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+            el.classList.add("active");
+            document.getElementById("tab-" + name).classList.add("active");
+        }
+
+        function pickMood(btn, val) {
+            document.querySelectorAll(".mood-chip").forEach(b => b.classList.remove("on"));
+            btn.classList.add("on");
+            mood = val;
+        }
+
+        async function loadAll() {
+            await Promise.all([loadPhotos(), loadNotes()]);
+        }
+
+        // ── VISTA DE FOTOS ────────────────────────────────────────────
+        function setView(v) {
+            currentView = v;
+            ["grid", "large", "list"].forEach(n => {
+                document.getElementById(`vbtn-${n}`).classList.toggle("active", n === v);
+            });
+            const grid = document.getElementById("photo-grid");
+            grid.className = "photo-grid" + (v === "grid" ? "" : ` view-${v}`);
+            // Re-renderizar para ajustar el HTML de cada card (lista necesita columna de info)
+            renderPhotos(allPhotos);
+        }
+
+        // ── FOTOS ─────────────────────────────────────────────────────
+        function processImageFile(file) {
+            return new Promise((resolve, reject) => {
+                const canvas = document.createElement("canvas");
+                const img = new Image();
+                const reader = new FileReader();
+                reader.onload = e => {
+                    img.onload = () => {
+                        const MAX = 600;
+                        let w = img.width, h = img.height;
+                        if (w > h && w > MAX) { h = h * MAX / w; w = MAX; }
+                        else if (h > MAX) { w = w * MAX / h; h = MAX; }
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL("image/jpeg", 0.65));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function addPhoto(event) {
+            const files = Array.from(event.target.files);
+            event.target.value = "";
+            if (!files.length) return;
+
+            const date = new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+
+            if (files.length === 1) {
+                showToast("⏳ Subiendo foto...");
+                try {
+                    const src = await processImageFile(files[0]);
+                    const { error } = await db.from("photos").insert({ src, date, reactions: {} });
+                    if (error) { showToast("❌ Error: " + (error.message || "No se pudo subir")); return; }
+                    showToast("📸 Foto guardada para los dos");
+                } catch (e) { showToast("❌ Error al procesar la foto"); return; }
+            } else {
+                showToast(`⏳ Subiendo ${files.length} fotos...`);
+                let ok = 0, fail = 0;
+                for (const file of files) {
+                    try {
+                        const src = await processImageFile(file);
+                        const { error } = await db.from("photos").insert({ src, date, reactions: {} });
+                        if (error) fail++; else ok++;
+                    } catch (e) { fail++; }
+                }
+                showToast(fail === 0
+                    ? `📸 ${ok} fotos guardadas para los dos`
+                    : `📸 ${ok} guardadas, ${fail} fallaron`);
+            }
+            await loadPhotos();
+        }
+
+        async function deletePhoto(id) {
+            const ok = await showConfirm("¿Eliminar esta foto?", "Esta foto desaparecerá para los dos y no se puede recuperar.");
+            if (!ok) return;
+            const { error } = await db.from("photos").delete().eq("id", id);
+            if (error) { showToast("❌ Error al eliminar"); return; }
+            showToast("🗑️ Foto eliminada");
+            await loadPhotos();
+        }
+
+        async function loadPhotos() {
+            const { data, error } = await db.from("photos").select("*").order("created_at", { ascending: false });
+            if (error) { console.error(error); return; }
+            allPhotos = data || [];
+            renderPhotos(allPhotos);
+        }
+
+        function renderPhotos(photos) {
+            const grid = document.getElementById("photo-grid");
+            const empty = document.getElementById("photos-empty");
+            document.getElementById("photo-count").textContent = photos.length;
+            if (!photos.length) { grid.innerHTML = ""; empty.style.display = "block"; return; }
+            empty.style.display = "none";
+
+            grid.innerHTML = photos.map((p, idx) => {
+                const reactions = p.reactions || {};
+                const mySet = getMyReactions("photo", p.id);
+                const reactionPills = Object.entries(reactions)
+                    .filter(([, cnt]) => cnt > 0)
+                    .map(([emoji, cnt]) => `
+                <button class="reaction-pill ${mySet.has(emoji) ? "mine" : ""}"
+                    onclick="event.stopPropagation();togglePhotoReaction(${p.id},'${emoji}',${idx})"
+                    title="${emoji}">
+                    ${emoji}<span class="r-count">${cnt}</span>
+                </button>`).join("");
+
+                if (currentView === "list") {
+                    // Card horizontal
+                    return `
+            <div class="photo-card" onclick="openLightbox(${idx})">
+                <img src="${p.src}" alt="recuerdo" />
+                <div class="photo-card-info">
+                    <div class="photo-date-text">📅 ${p.date}</div>
+                    <div class="photo-reactions-row">
+                        ${Object.entries(reactions).filter(([, c]) => c > 0).map(([emoji, cnt]) => `
+                            <button class="note-reaction-btn ${mySet.has(emoji) ? 'mine' : ''}"
+                                onclick="event.stopPropagation();togglePhotoReaction(${p.id},'${emoji}',${idx})"
+                                style="font-size:12px;padding:3px 10px;">
+                                ${emoji}<span class="r-count">${cnt}</span>
+                            </button>`).join("")}
+                        <button class="note-add-reaction" style="font-size:12px;padding:3px 8px;"
+                            onclick="event.stopPropagation();openEmojiPickerForPhoto(this,${p.id},${idx})">
+                            + 😊
+                        </button>
+                    </div>
+                    <button class="photo-del" style="position:static;display:inline-flex;background:#FBEAF0;color:#E24B4A;border-radius:8px;width:auto;height:auto;padding:4px 10px;font-size:12px;"
+                        onclick="event.stopPropagation();deletePhoto(${p.id})">🗑️ Eliminar</button>
+                </div>
+            </div>`;
+                }
+
+                // Grid / Grande
+                return `
+        <div class="photo-card" onclick="openLightbox(${idx})">
+            <img src="${p.src}" alt="recuerdo" />
+            <button class="photo-del" onclick="event.stopPropagation();deletePhoto(${p.id})">✕</button>
+            <button class="photo-add-reaction" onclick="event.stopPropagation();openEmojiPicker(this, em=>togglePhotoReaction(${p.id},em,${idx}))">😊</button>
+            <div class="photo-date">${p.date}</div>
+            <div class="photo-reactions">${reactionPills}</div>
+        </div>`;
+            }).join("");
+        }
+
+        async function togglePhotoReaction(photoId, emoji, idx) {
+            const photo = allPhotos.find(p => p.id === photoId);
+            if (!photo) return;
+            const reactions = { ...(photo.reactions || {}) };
+            const mySet = getMyReactions("photo", photoId);
+            const alreadyMine = mySet.has(emoji);
+
+            if (alreadyMine) {
+                reactions[emoji] = Math.max(0, (reactions[emoji] || 1) - 1);
+                setMyReaction("photo", photoId, emoji, false);
+            } else {
+                reactions[emoji] = (reactions[emoji] || 0) + 1;
+                setMyReaction("photo", photoId, emoji, true);
+            }
+
+            photo.reactions = reactions;
+            await db.from("photos").update({ reactions }).eq("id", photoId);
+            renderPhotos(allPhotos);
+            // Si el lightbox está abierto con esta foto, actualizar
+            if (document.getElementById("lightbox").classList.contains("open") && lbIndex === idx) {
+                renderLightboxReactions(photoId);
+            }
+        }
+
+        // ── LIGHTBOX ──────────────────────────────────────────────────
+        function openLightbox(idx) {
+            lbIndex = idx;
+            showLightboxPhoto();
+            document.getElementById("lightbox").classList.add("open");
+        }
+        function closeLightbox() {
+            document.getElementById("lightbox").classList.remove("open");
+        }
+        function lightboxNav(dir) {
+            lbIndex = Math.max(0, Math.min(allPhotos.length - 1, lbIndex + dir));
+            showLightboxPhoto();
+        }
+        function showLightboxPhoto() {
+            const p = allPhotos[lbIndex];
+            if (!p) return;
+            const img = document.getElementById("lightbox-img");
+            img.style.opacity = "0";
+            setTimeout(() => { img.src = p.src; img.style.opacity = "1"; }, 100);
+            document.getElementById("lightbox-date").textContent = "📅 " + p.date;
+            document.getElementById("lb-prev").disabled = lbIndex === 0;
+            document.getElementById("lb-next").disabled = lbIndex === allPhotos.length - 1;
+            renderLightboxReactions(p.id);
+        }
+        function renderLightboxReactions(photoId) {
+            const photo = allPhotos.find(p => p.id === photoId);
+            if (!photo) return;
+            const reactions = photo.reactions || {};
+            const mySet = getMyReactions("photo", photoId);
+            const idx = allPhotos.indexOf(photo);
+            const ALL_EMOJIS = ["❤️", "😍", "🥰", "😂", "😮", "🔥", "✨", "💫", "🌊", "💙"];
+
+            document.getElementById("lightbox-reactions").innerHTML = ALL_EMOJIS.map(emoji => {
+                const cnt = reactions[emoji] || 0;
+                const mine = mySet.has(emoji);
+                return `<button class="lb-reaction ${mine ? "mine" : ""}"
+            onclick="togglePhotoReaction(${photoId},'${emoji}',${idx})">
+            ${emoji}<span class="r-count">${cnt > 0 ? cnt : ""}</span>
+        </button>`;
+            }).join("");
+        }
+        // Cerrar lightbox al hacer click fuera de la imagen
+        document.getElementById("lightbox").addEventListener("click", function (e) {
+            if (e.target === this) closeLightbox();
+        });
+        // Navegación con teclado
+        document.addEventListener("keydown", e => {
+            if (!document.getElementById("lightbox").classList.contains("open")) return;
+            if (e.key === "ArrowLeft") lightboxNav(-1);
+            if (e.key === "ArrowRight") lightboxNav(1);
+            if (e.key === "Escape") closeLightbox();
+        });
+
+        // ── NOTAS ─────────────────────────────────────────────────────
+        async function saveNote() {
+            const title = document.getElementById("note-title").value.trim();
+            const body = document.getElementById("note-body").value.trim();
+            if (!title && !body) { showToast("✏️ Escribe algo primero"); return; }
+            const btn = document.getElementById("save-note-btn");
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Guardando...';
+
+            if (editingNoteId) {
+                // Modo edición: actualizar nota existente
+                const { error } = await db.from("notes").update({ title: title || "Sin título", body, mood }).eq("id", editingNoteId);
+                btn.disabled = false;
+                btn.innerHTML = "Guardar recuerdo 💾";
+                btn.style.background = "";
+                editingNoteId = null;
+                if (error) { showToast("❌ Error al actualizar"); return; }
+                showToast("✏️ Nota actualizada");
+            } else {
+                // Modo creación: insertar nueva nota
+                const date = new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+                const { error } = await db.from("notes").insert({ title: title || "Sin título", body, mood, date, reactions: {}, author: currentAuthor || null });
+                btn.disabled = false;
+                btn.innerHTML = "Guardar recuerdo 💾";
+                if (error) { showToast("❌ Error al guardar"); return; }
+                showToast("💙 Recuerdo guardado para los dos");
+            }
+
+            document.getElementById("note-title").value = "";
+            document.getElementById("note-body").value = "";
+            mood = "";
+            document.querySelectorAll(".mood-chip").forEach(b => b.classList.remove("on"));
+            await loadNotes();
+        }
+
+        async function deleteNote(id) {
+            const ok = await showConfirm("¿Eliminar este recuerdo?", "Esta nota desaparecerá para los dos y no se puede recuperar.");
+            if (!ok) return;
+            const { error } = await db.from("notes").delete().eq("id", id);
+            if (error) { showToast("❌ Error al eliminar"); return; }
+            showToast("🗑️ Nota eliminada");
+            await loadNotes();
+        }
+
+        let editingNoteId = null;
+        function editNote(id) {
+            const note = allNotes.find(n => n.id === id);
+            if (!note) return;
+
+            // Ir a la pestaña de notas y rellenar el formulario con los datos actuales
+            switchTab("notes");
+            document.getElementById("note-title").value = note.title || "";
+            document.getElementById("note-body").value = note.body || "";
+
+            // Seleccionar el mood si existe
+            mood = note.mood || "";
+            document.querySelectorAll(".mood-chip").forEach(b => {
+                b.classList.toggle("on", b.dataset.mood === mood);
+            });
+
+            // Cambiar el botón de guardar a modo edición
+            editingNoteId = id;
+            const btn = document.getElementById("save-note-btn");
+            btn.innerHTML = "Guardar cambios ✏️";
+            btn.style.background = "linear-gradient(135deg, #378ADD, #185FA5)";
+
+            // Scroll al formulario
+            document.getElementById("note-title").scrollIntoView({ behavior: "smooth", block: "center" });
+            document.getElementById("note-title").focus();
+            showToast("✏️ Editando nota — guarda cuando termines");
+        }
+
+        async function loadNotes() {
+            const { data, error } = await db.from("notes").select("*").order("created_at", { ascending: false });
+            if (error) { console.error(error); return; }
+            renderNotes(data || []);
+        }
+
+        let allNotes = [];
+        function renderNotes(notes) {
+            allNotes = notes;
+            const list = document.getElementById("notes-list");
+            const empty = document.getElementById("notes-empty");
+            if (!notes.length) { list.innerHTML = ""; empty.style.display = "block"; return; }
+            empty.style.display = "none";
+            list.innerHTML = notes.map(n => {
+                const reactions = n.reactions || {};
+                const mySet = getMyReactions("note", n.id);
+                const reactionBtns = Object.entries(reactions)
+                    .filter(([, cnt]) => cnt > 0)
+                    .map(([emoji, cnt]) => {
+                        const safeEmoji = emoji.replace(/'/g, "\\'");
+                        return `<button class="note-reaction-btn ${mySet.has(emoji) ? "mine" : ""}"
+                    onclick="toggleNoteReaction(${n.id},'${safeEmoji}')">
+                    ${emoji}<span class="r-count">${cnt}</span>
+                </button>`;
+                    }).join("");
+
+                return `
+        <div class="note-card author-${(n.author || '').toLowerCase()}" id="ncard-${n.id}">
+            <button class="note-del-btn" onclick="deleteNote(${n.id})">✕</button>
+            <button class="note-edit-btn" onclick="editNote(${n.id})" title="Editar">✏️</button>
+            ${n.author ? `<div class="note-author-badge ${n.author.toLowerCase()}">${n.author === 'Ever' ? '💙' : '🩷'} ${n.author}</div>` : ''}
+            <div class="note-card-title">${n.title}</div>
+            ${n.mood ? `<div class="note-card-mood">${n.mood}</div>` : ""}
+            ${n.body ? `<div class="note-card-body">${n.body}</div>` : ""}
+            ${n.audio_base64 ? `
+            <div class="note-audio-player" id="aplayer-${n.id}">
+                <button class="audio-play-btn" onclick="toggleAudio(${n.id},'${n.audio_base64.substring(0, 20)}')">▶</button>
+                <div class="audio-progress-wrap" onclick="seekAudio(event,${n.id})">
+                    <div class="audio-progress-bar" id="aprog-${n.id}"></div>
+                </div>
+                <span class="audio-duration" id="adur-${n.id}">${formatDur(n.audio_duration || 0)}</span>
+            </div>` : ""}
+            <div class="note-card-date">${n.date}</div>
+            <div class="note-reactions">
+                ${reactionBtns}
+                <button class="note-add-reaction"
+                    onclick="openEmojiPickerForNote(this, ${n.id})">
+                    + 😊
+                </button>
+            </div>
+        </div>`;
+            }).join("");
+        }
+
+        async function toggleNoteReaction(noteId, emoji) {
+            const note = allNotes.find(n => n.id === noteId);
+            if (!note) return;
+            const reactions = { ...(note.reactions || {}) };
+            const mySet = getMyReactions("note", noteId);
+            const alreadyMine = mySet.has(emoji);
+
+            if (alreadyMine) {
+                reactions[emoji] = Math.max(0, (reactions[emoji] || 1) - 1);
+                setMyReaction("note", noteId, emoji, false);
+            } else {
+                reactions[emoji] = (reactions[emoji] || 0) + 1;
+                setMyReaction("note", noteId, emoji, true);
+            }
+
+            note.reactions = reactions;
+            await db.from("notes").update({ reactions }).eq("id", noteId);
+            renderNotes(allNotes);
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // ── FONDO PERSONALIZADO ───────────────────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        function openSettings() {
+            // Mostrar preview si ya hay fondo guardado
+            const saved = localStorage.getItem("custom_bg");
+            const preview = document.getElementById("bg-preview");
+            if (saved) {
+                preview.innerHTML = `<img src="${saved}"><span class="overlay-label">🖼️ Cambiar foto</span>`;
+            } else {
+                preview.innerHTML = `<span class="overlay-label">🖼️ Toca para elegir una foto</span>`;
+            }
+            document.getElementById("settings-overlay").classList.add("open");
+        }
+        function closeSettings() {
+            document.getElementById("settings-overlay").classList.remove("open");
+        }
+        function applyBackground(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const dataUrl = e.target.result;
+                localStorage.setItem("custom_bg", dataUrl);
+                _setBgOnElements(dataUrl);
+                document.getElementById("bg-preview").innerHTML =
+                    `<img src="${dataUrl}"><span class="overlay-label">🖼️ Cambiar foto</span>`;
+                showToast("🖼️ Fondo aplicado");
+            };
+            reader.readAsDataURL(file);
+            event.target.value = "";
+        }
+        function removeBackground() {
+            localStorage.removeItem("custom_bg");
+            _setBgOnElements(null);
+            document.getElementById("bg-preview").innerHTML =
+                `<span class="overlay-label">🖼️ Toca para elegir una foto</span>`;
+            showToast("🗑️ Fondo eliminado");
+        }
+        function _setBgOnElements(dataUrl) {
+            const app = document.getElementById("app");
+            const lock = document.getElementById("lock-screen");
+            if (dataUrl) {
+                app.style.backgroundImage = `url(${dataUrl})`;
+                lock.style.backgroundImage = `url(${dataUrl})`;
+                app.classList.add("has-bg");
+                lock.classList.add("has-bg");
+            } else {
+                app.style.backgroundImage = "";
+                lock.style.backgroundImage = "";
+                app.classList.remove("has-bg");
+                lock.classList.remove("has-bg");
+            }
+        }
+        // Aplicar fondo guardado al cargar
+        (function initBackground() {
+            const saved = localStorage.getItem("custom_bg");
+            if (saved) _setBgOnElements(saved);
+        })();
+
+        // ══════════════════════════════════════════════════════════════
+        // ── CARTAS DE AMOR PROGRAMADAS ────────────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        let letterType = "normal";
+        function setLetterType(type) {
+            letterType = type;
+            document.getElementById("ltype-normal").classList.toggle("active", type === "normal");
+            document.getElementById("ltype-programada").classList.toggle("active", type === "programada");
+            document.getElementById("letter-date-section").style.display = type === "programada" ? "block" : "none";
+            document.getElementById("letter-body").placeholder = type === "programada"
+                ? "Escribe todo lo que sientes... se guardará bajo llave hasta la fecha que elijas 🔒"
+                : "Escribe todo lo que sientes... 💌";
+        }
+
+        async function saveLetter() {
+            const title = document.getElementById("letter-title").value.trim();
+            const body = document.getElementById("letter-body").value.trim();
+            const dateVal = document.getElementById("letter-date").value;
+            if (!title || !body) { showToast("✏️ Escribe el título y la carta"); return; }
+
+            if (letterType === "programada") {
+                if (!dateVal) { showToast("📅 Elige una fecha de apertura"); return; }
+                const today = new Date().toISOString().split("T")[0];
+                if (dateVal <= today) { showToast("📅 Elige una fecha futura"); return; }
+            }
+
+            const btn = document.getElementById("save-letter-btn");
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Guardando...';
+
+            const today = new Date().toISOString().split("T")[0];
+            const { error } = await db.from("letters").insert({
+                title,
+                body,
+                unlock_date: letterType === "programada" ? dateVal : today,
+                opened: false,
+                author: currentAuthor || null,
+                is_normal: letterType === "normal"
+            });
+
+            btn.disabled = false;
+            btn.innerHTML = "Guardar carta 💌";
+            if (error) { showToast("❌ Error al guardar: " + error.message); return; }
+
+            document.getElementById("letter-title").value = "";
+            document.getElementById("letter-body").value = "";
+            document.getElementById("letter-date").value = "";
+            showToast(letterType === "normal"
+                ? "💌 Carta enviada con amor"
+                : "💌 Carta guardada, se abrirá el " + new Date(dateVal + "T12:00:00").toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" }));
+            await loadLetters();
+        }
+
+        async function deleteLetter(id) {
+            const ok = await showConfirm("¿Eliminar esta carta?", "La carta desaparecerá para los dos.");
+            if (!ok) return;
+            await db.from("letters").delete().eq("id", id);
+            showToast("🗑️ Carta eliminada");
+            await loadLetters();
+        }
+
+        async function loadLetters() {
+            const { data, error } = await db.from("letters").select("*").order("unlock_date", { ascending: true });
+            if (error) { console.error(error); return; }
+            renderLetters(data || []);
+            checkLetterNotifications(data || []);
+        }
+
+        function getCountdown(unlockDate) {
+            const now = new Date();
+            const target = new Date(unlockDate + "T00:00:00");
+            const diff = target - now;
+            if (diff <= 0) return null;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            if (days > 0) return `${days} día${days !== 1 ? "s" : ""} y ${hours}h`;
+            if (hours > 0) return `${hours}h ${mins}m`;
+            return `${mins} minuto${mins !== 1 ? "s" : ""}`;
+        }
+
+        function renderLetters(letters) {
+            const list = document.getElementById("letters-list");
+            const empty = document.getElementById("letters-empty");
+            if (!letters.length) { list.innerHTML = ""; empty.style.display = "block"; return; }
+            empty.style.display = "none";
+            const today = new Date().toISOString().split("T")[0];
+
+            list.innerHTML = letters.map(l => {
+                const isUnlocked = !l.unlock_date || l.unlock_date <= today || l.is_normal;
+                const dateLabel = l.unlock_date
+                    ? new Date(l.unlock_date + "T12:00:00").toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" })
+                    : "";
+                const countdown = !isUnlocked ? getCountdown(l.unlock_date) : null;
+                const previewText = !isUnlocked ? (l.body || "").substring(0, 60) + "..." : "";
+                const authorBadge = l.author
+                    ? `<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;">${l.author === "Ever" ? "💙" : "🩷"} ${l.author}</div>`
+                    : "";
+                const replyBadge = l.reply
+                    ? `<div style="font-size:11px;color:var(--pink);margin-top:6px;">💬 Ya tiene respuesta</div>`
+                    : "";
+
+                return `
+        <div class="letter-card ${isUnlocked ? "" : "locked"}" id="lcard-${l.id}">
+            <button class="letter-del-btn" onclick="deleteLetter(${l.id})">✕</button>
+            ${authorBadge}
+            <div class="letter-card-title">${isUnlocked ? (l.is_normal ? "💌 " : "💌 ") : "🔒 "}${l.title}</div>
+            ${dateLabel ? `<div class="letter-card-date">📅 ${isUnlocked ? "Desbloqueada el " : "Se abre el "}${dateLabel}</div>` : ""}
+            ${!isUnlocked ? `
+                <div class="letter-preview-blur">${previewText}</div>
+                ${countdown ? `<div class="letter-countdown">⏳ Se abre en ${countdown}</div>` : ""}
+            ` : `
+                ${replyBadge}
+                <button class="save-btn" style="padding:8px 18px;font-size:13px;margin-top:6px;"
+                    onclick="openLetterModal(${l.id})">Abrir carta 💖</button>
+            `}
+        </div>`;
+            }).join("");
+        }
+
+        let currentLetterModalId = null;
+        function openLetterModal(id) {
+            const letter = (window._allLetters || []).find(l => l.id === id);
+            if (!letter) return;
+            currentLetterModalId = id;
+            const dateLabel = letter.unlock_date
+                ? new Date(letter.unlock_date + "T12:00:00").toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" })
+                : "";
+            document.getElementById("lo-title").textContent = letter.title;
+            document.getElementById("lo-date").textContent = dateLabel ? (letter.is_normal ? "📅 " + dateLabel : "📅 Desbloqueada el " + dateLabel) : "";
+            document.getElementById("lo-body").textContent = letter.body;
+
+            // Respuesta
+            const replyDisplay = document.getElementById("lo-reply-display");
+            const replyForm = document.getElementById("lo-reply-form");
+            const replyText = document.getElementById("lo-reply-text");
+            const replyInput = document.getElementById("lo-reply-input");
+            if (letter.reply) {
+                replyText.textContent = letter.reply;
+                replyDisplay.style.display = "block";
+                replyForm.style.display = "none";
+            } else {
+                replyDisplay.style.display = "none";
+                replyForm.style.display = "block";
+                replyInput.value = "";
+            }
+
+            document.getElementById("letter-open-overlay").classList.add("open");
+            if (!letter.is_normal) launchConfetti();
+        }
+
+        async function saveLetterReply() {
+            const reply = document.getElementById("lo-reply-input").value.trim();
+            if (!reply) { showToast("✏️ Escribe tu respuesta"); return; }
+            if (!currentLetterModalId) return;
+            const { error } = await db.from("letters").update({ reply }).eq("id", currentLetterModalId);
+            if (error) { showToast("❌ Error al guardar respuesta"); return; }
+            showToast("💕 Respuesta guardada");
+            document.getElementById("lo-reply-form").style.display = "none";
+            document.getElementById("lo-reply-text").textContent = reply;
+            document.getElementById("lo-reply-display").style.display = "block";
+            await loadLetters();
+        }
+
+        function closeLetterModal() {
+            document.getElementById("letter-open-overlay").classList.remove("open");
+            currentLetterModalId = null;
+        }
+
+        // Guardar cache de cartas para el modal
+        const _origRenderLetters = renderLetters;
+        window.renderLetters = function (letters) {
+            window._allLetters = letters;
+            _origRenderLetters(letters);
+        };
+
+        // Notificaciones Web: avisa cuando hay carta desbloqueada hoy
+        async function checkLetterNotifications(letters) {
+            if (!("Notification" in window)) return;
+            const today = new Date().toISOString().split("T")[0];
+            const newlyUnlocked = letters.filter(l => l.unlock_date === today && !l.opened);
+            if (!newlyUnlocked.length) return;
+
+            // Pedir permiso si no lo tiene
+            if (Notification.permission === "default") {
+                await Notification.requestPermission();
+            }
+            if (Notification.permission !== "granted") return;
+
+            // Solo notificar una vez por sesión
+            const notifKey = "notified_" + today;
+            if (localStorage.getItem(notifKey)) return;
+            localStorage.setItem(notifKey, "1");
+
+            newlyUnlocked.forEach(l => {
+                new Notification("💌 ¡Tienes una carta de amor!", {
+                    body: l.title + " — ¡Ya puedes abrirla!",
+                    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💌</text></svg>"
+                });
+            });
+        }
+
+        // ── CONFETTI ─────────────────────────────────────────────────
+        function launchConfetti() {
+            const canvas = document.getElementById("confetti-canvas");
+            canvas.style.display = "block";
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const ctx = canvas.getContext("2d");
+            const colors = ["#D4537E", "#378ADD", "#F4C0D1", "#FFD700", "#FF6B9D", "#A8EDEA"];
+            const particles = Array.from({ length: 80 }, () => ({
+                x: Math.random() * canvas.width,
+                y: -20,
+                r: Math.random() * 7 + 3,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                speed: Math.random() * 3 + 2,
+                angle: Math.random() * Math.PI * 2,
+                spin: (Math.random() - 0.5) * 0.2,
+                drift: (Math.random() - 0.5) * 2
+            }));
+            let frame;
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+                particles.forEach(p => {
+                    p.y += p.speed;
+                    p.x += p.drift;
+                    p.angle += p.spin;
+                    if (p.y < canvas.height + 20) alive = true;
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.angle);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.r, -p.r / 2, p.r * 2, p.r);
+                    ctx.restore();
+                });
+                if (alive) { frame = requestAnimationFrame(draw); }
+                else { canvas.style.display = "none"; cancelAnimationFrame(frame); }
+            }
+            draw();
+            setTimeout(() => { canvas.style.display = "none"; cancelAnimationFrame(frame); }, 4000);
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // ── NOTAS DE VOZ ─────────────────────────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recTimerInt = null;
+        let recSeconds = 0;
+        let recordedAudioB64 = null;
+        let recordedDuration = 0;
+        const activeAudios = {}; // id -> HTMLAudioElement
+
+        function formatDur(secs) {
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return `${m}:${String(s).padStart(2, "0")}`;
+        }
+
+        async function toggleRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(audioChunks, { type: "audio/webm" });
+                    recordedDuration = recSeconds;
+                    const reader = new FileReader();
+                    reader.onload = ev => {
+                        recordedAudioB64 = ev.target.result; // data:audio/webm;base64,...
+                        document.getElementById("voice-rec-label").textContent = `✅ Grabado: ${formatDur(recordedDuration)}`;
+                        document.getElementById("voice-rec-timer").style.display = "none";
+                        document.getElementById("voice-rec-clear").style.display = "flex";
+                        document.getElementById("voice-rec-btn").innerHTML = "🎙️";
+                        document.getElementById("voice-rec-btn").classList.remove("recording");
+                    };
+                    reader.readAsDataURL(blob);
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                mediaRecorder.start();
+                recSeconds = 0;
+                document.getElementById("voice-rec-btn").classList.add("recording");
+                document.getElementById("voice-rec-btn").innerHTML = "⏹";
+                document.getElementById("voice-rec-label").textContent = "Grabando...";
+                document.getElementById("voice-rec-timer").style.display = "block";
+                document.getElementById("voice-rec-timer").textContent = "0:00";
+                recTimerInt = setInterval(() => {
+                    recSeconds++;
+                    document.getElementById("voice-rec-timer").textContent = formatDur(recSeconds);
+                    if (recSeconds >= 120) stopRecording(); // límite 2 min
+                }, 1000);
+            } catch (err) {
+                showToast("🎙️ No se pudo acceder al micrófono");
+            }
+        }
+
+        function stopRecording() {
+            clearInterval(recTimerInt);
+            if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+        }
+
+        function clearRecording() {
+            recordedAudioB64 = null;
+            recordedDuration = 0;
+            document.getElementById("voice-rec-label").textContent = "Toca para grabar un mensaje de voz";
+            document.getElementById("voice-rec-clear").style.display = "none";
+            document.getElementById("voice-rec-timer").style.display = "none";
+            document.getElementById("voice-rec-btn").innerHTML = "🎙️";
+            document.getElementById("voice-rec-btn").classList.remove("recording");
+        }
+
+        // Reproducción del audio en note cards
+        function toggleAudio(noteId, _key) {
+            const note = allNotes.find(n => n.id === noteId);
+            if (!note || !note.audio_base64) return;
+            const btn = document.querySelector(`#aplayer-${noteId} .audio-play-btn`);
+            const prog = document.getElementById(`aprog-${noteId}`);
+            const dur = document.getElementById(`adur-${noteId}`);
+
+            if (activeAudios[noteId]) {
+                const audio = activeAudios[noteId];
+                if (!audio.paused) { audio.pause(); btn.textContent = "▶"; return; }
+                audio.play(); btn.textContent = "⏸"; return;
+            }
+
+            const audio = new Audio(note.audio_base64);
+            activeAudios[noteId] = audio;
+            audio.ontimeupdate = () => {
+                if (!audio.duration) return;
+                const pct = (audio.currentTime / audio.duration) * 100;
+                prog.style.width = pct + "%";
+                dur.textContent = formatDur(Math.floor(audio.currentTime));
+            };
+            audio.onended = () => {
+                btn.textContent = "▶";
+                prog.style.width = "0%";
+                dur.textContent = formatDur(note.audio_duration || 0);
+                delete activeAudios[noteId];
+            };
+            audio.play();
+            btn.textContent = "⏸";
+        }
+
+        function seekAudio(event, noteId) {
+            const audio = activeAudios[noteId];
+            if (!audio || !audio.duration) return;
+            const wrap = event.currentTarget;
+            const pct = event.offsetX / wrap.offsetWidth;
+            audio.currentTime = pct * audio.duration;
+        }
+
+        // Modificar saveNote para incluir audio
+        const _origSaveNote = saveNote;
+        window.saveNote = async function () {
+            // Inyectar audio en la inserción
+            const title = document.getElementById("note-title").value.trim();
+            const body = document.getElementById("note-body").value.trim();
+            if (!title && !body) { showToast("✏️ Escribe algo primero"); return; }
+            const btn = document.getElementById("save-note-btn");
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Guardando...';
+            const date = new Date().toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" });
+            const insertData = {
+                title: title || "Sin título",
+                body,
+                mood,
+                date,
+                reactions: {},
+                author: currentAuthor || null,
+                audio_base64: recordedAudioB64 || null,
+                audio_duration: recordedAudioB64 ? recordedDuration : null
+            };
+            const { error } = await db.from("notes").insert(insertData);
+            btn.disabled = false;
+            btn.innerHTML = "Guardar recuerdo 💾";
+            if (error) { showToast("❌ Error al guardar"); return; }
+            document.getElementById("note-title").value = "";
+            document.getElementById("note-body").value = "";
+            mood = "";
+            document.querySelectorAll(".mood-chip").forEach(b => b.classList.remove("on"));
+            clearRecording();
+            showToast(recordedAudioB64 ? "🎙️ Recuerdo con voz guardado 💙" : "💙 Recuerdo guardado para los dos");
+            await loadNotes();
+        };
+
+        // Integrar loadLetters en loadAll
+        const _origLoadAll = loadAll;
+        window.loadAll = async function () {
+            await Promise.all([loadPhotos(), loadNotes(), loadLetters()]);
+        };
+
+        // ══════════════════════════════════════════════════════════════
+        // ── PWA: REGISTRO DEL SERVICE WORKER ─────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("./sw.js").catch(err => {
+                    console.error("Error registrando service worker:", err);
+                });
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════
+        // ── PUSH NOTIFICATIONS REALES ─────────────────────────────────
+        // ══════════════════════════════════════════════════════════════
+        // Pega aquí tu VAPID Public Key (la misma que configuraste como
+        // secreto VAPID_PUBLIC_KEY en la Edge Function de Supabase).
+        const VAPID_PUBLIC_KEY = "BB9JLGjI4Rmck8-qqxAaVPOmAZ7xefoxRVAqNSxwFmXX4Mhw43ER5MbridjufIiN2WSM-Lxwtw2bWg5UJm84ipY";
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = "=".repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+            const rawData = window.atob(base64);
+            return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+        }
+
+        async function isPushSubscribed() {
+            if (!("serviceWorker" in navigator) || !("PushManager" in window)) return false;
+            const reg = await navigator.serviceWorker.ready;
+            const sub = await reg.pushManager.getSubscription();
+            return !!sub;
+        }
+
+        async function updatePushButtonLabel() {
+            const btn = document.getElementById("push-toggle-btn");
+            if (!btn) return;
+            if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+                btn.textContent = "🔕 No disponible en este navegador";
+                btn.disabled = true;
+                return;
+            }
+            const subscribed = await isPushSubscribed();
+            btn.textContent = subscribed ? "🔔 Notificaciones activadas ✓" : "🔔 Activar notificaciones";
+        }
+
+        async function togglePushSubscription() {
+            if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+                showToast("🔕 Tu navegador no soporta notificaciones push");
+                return;
+            }
+            const btn = document.getElementById("push-toggle-btn");
+            const reg = await navigator.serviceWorker.ready;
+            const existing = await reg.pushManager.getSubscription();
+
+            if (existing) {
+                // Desactivar
+                await db.from("push_subscriptions").delete().eq("endpoint", existing.endpoint);
+                await existing.unsubscribe();
+                showToast("🔕 Notificaciones desactivadas");
+                await updatePushButtonLabel();
+                return;
+            }
+
+            // Activar
+            const permission = await Notification.requestPermission();
+            if (permission !== "granted") {
+                showToast("🔕 Necesitas dar permiso para recibir notificaciones");
+                return;
+            }
+            if (VAPID_PUBLIC_KEY === "PEGA_AQUI_TU_VAPID_PUBLIC_KEY") {
+                showToast("⚠️ Falta configurar la VAPID key en el código");
+                return;
+            }
+            try {
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+                });
+                const subJson = sub.toJSON();
+                const { error } = await db.from("push_subscriptions").upsert({
+                    author: currentAuthor || null,
+                    endpoint: subJson.endpoint,
+                    p256dh: subJson.keys.p256dh,
+                    auth: subJson.keys.auth
+                }, { onConflict: "endpoint" });
+                if (error) throw error;
+                showToast("🔔 ¡Notificaciones activadas!");
+            } catch (err) {
+                console.error("Error al suscribirse a push:", err);
+                showToast("❌ No se pudo activar las notificaciones");
+            }
+            await updatePushButtonLabel();
+        }
+
+        // Botón "Pensando en ti 💭" — dispara un push manual al otro
+        async function sendThinkingOfYou() {
+            try {
+                const res = await fetch("https://qxlfuexvnsopzajwycnz.supabase.co/functions/v1/send-push", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4bGZ1ZXh2bnNvcHphand5Y256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjU2ODUsImV4cCI6MjA5MjA0MTY4NX0.3UpiBM7dbylmsIQV-O0I8Fs-akXHzvyVVC5w8P7EhlA"
+                    },
+                    body: JSON.stringify({
+                        table: "manual",
+                        record: { author: currentAuthor, body: `${currentAuthor || "Tu pareja"} está pensando en ti ahora mismo 💕` },
+                        excludeAuthor: currentAuthor || null
+                    })
+                });
+                if (!res.ok) throw new Error("Status " + res.status);
+                showToast("💭 Le avisamos que estás pensando en él/ella");
+            } catch (err) {
+                console.error("Error enviando 'pensando en ti':", err);
+                showToast("❌ No se pudo enviar, intenta de nuevo");
+            }
+        }
+
+        // Actualizar el label del botón cuando se abren los ajustes
+        const _origOpenSettings = openSettings;
+        window.openSettings = function () {
+            _origOpenSettings();
+            updatePushButtonLabel();
+        };
+    </script>
+</body>
+
+</html>

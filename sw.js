@@ -1,17 +1,18 @@
 // sw.js — Service Worker: habilita instalación PWA + recibe push reales
 const CACHE_NAME = "recuerdos-cache-v1";
 const CORE_ASSETS = [
-    "./",
-    "./index.html",
-    "./manifest.json",
-    "./icon-192.png",
-    "./icon-512.png"
+    "/Index.html",
+    "/manifest.json",
+    "/icon-192.png",
+    "/icon-512.png"
 ];
 
-// ── INSTALL: precachear lo básico para que abra rápido / offline ──
+// ── INSTALL: precachear lo básico — si algo falla, no bloquear la instalación ──
 self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
+        caches.open(CACHE_NAME).then((cache) =>
+            Promise.allSettled(CORE_ASSETS.map(url => cache.add(url)))
+        )
     );
     self.skipWaiting();
 });
@@ -26,25 +27,21 @@ self.addEventListener("activate", (event) => {
     self.clients.claim();
 });
 
-// ── FETCH: cache-first para lo estático, red directa para todo lo demás (Supabase, etc.) ──
+// ── FETCH: cache-first para lo estático, red directa para todo lo demás ──
 self.addEventListener("fetch", (event) => {
     const url = new URL(event.request.url);
-    // Solo interceptamos peticiones del mismo origen (no Supabase, no fonts CDN)
     if (url.origin !== location.origin) return;
 
     event.respondWith(
         caches.match(event.request).then((cached) => {
-            return (
-                cached ||
-                fetch(event.request).catch(() => caches.match("./index.html"))
-            );
+            return cached || fetch(event.request).catch(() => caches.match("/Index.html"));
         })
     );
 });
 
 // ── PUSH: llega una notificación real desde el servidor (Edge Function) ──
 self.addEventListener("push", (event) => {
-    let payload = { title: "💌 Nuestros Recuerdos", body: "Tienes algo nuevo", icon: "./icon-192.png" };
+    let payload = { title: "💌 Nuestros Recuerdos", body: "Tienes algo nuevo", icon: "/icon-192.png" };
     try {
         if (event.data) payload = { ...payload, ...event.data.json() };
     } catch (e) {
@@ -53,10 +50,10 @@ self.addEventListener("push", (event) => {
 
     const options = {
         body: payload.body,
-        icon: payload.icon || "./icon-192.png",
-        badge: "./icon-192.png",
+        icon: payload.icon || "/icon-192.png",
+        badge: "/icon-192.png",
         vibrate: [100, 50, 100],
-        data: { url: payload.url || "./" },
+        data: { url: payload.url || "/" },
         tag: payload.tag || "recuerdos-notif"
     };
 
@@ -66,7 +63,7 @@ self.addEventListener("push", (event) => {
 // ── CLICK en la notificación: abrir/enfocar la app ──
 self.addEventListener("notificationclick", (event) => {
     event.notification.close();
-    const targetUrl = event.notification.data?.url || "./";
+    const targetUrl = event.notification.data?.url || "/";
 
     event.waitUntil(
         self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsArr) => {
